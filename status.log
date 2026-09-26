@@ -1,0 +1,27 @@
+REUSE train_source1.tsv ['prev/train_source1.tsv.gz.part-00', 'prev/train_source1.tsv.gz.part-01']
+OK train_source2.tsv 489301488
+OK train_source3.tsv 503705637
+OK train_ground_truth.tsv 127015583
+REUSE test_source1.tsv ['prev/test_source1.tsv.gz.part-00']
+OK test_source2.tsv 509456422
+OK test_source3.tsv 506002772
+total 1205004
+drwxr-xr-x 2 runner runner     4096 Sep 26 16:23 .
+drwxr-xr-x 4 runner runner     4096 Sep 26 16:22 ..
+-rw-r--r-- 1 runner runner      317 Sep 26 16:23 status.log
+-rw-r--r-- 1 runner runner 80327546 Sep 26 16:23 test_source1.tsv.gz.part-00
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 test_source2.tsv.gz.part-00
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 test_source2.tsv.gz.part-01
+-rw-r--r-- 1 runner runner 60863565 Sep 26 16:23 test_source2.tsv.gz.part-02
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 test_source3.tsv.gz.part-00
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 test_source3.tsv.gz.part-01
+-rw-r--r-- 1 runner runner 60090183 Sep 26 16:23 test_source3.tsv.gz.part-02
+-rw-r--r-- 1 runner runner 59689931 Sep 26 16:23 train_ground_truth.tsv.gz.part-00
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 train_source1.tsv.gz.part-00
+-rw-r--r-- 1 runner runner  4984395 Sep 26 16:23 train_source1.tsv.gz.part-01
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 train_source2.tsv.gz.part-00
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 train_source2.tsv.gz.part-01
+-rw-r--r-- 1 runner runner 56587905 Sep 26 16:23 train_source2.tsv.gz.part-02
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 train_source3.tsv.gz.part-00
+-rw-r--r-- 1 runner runner 94371840 Sep 26 16:23 train_source3.tsv.gz.part-01
+-rw-r--r-- 1 runner runner 62005522 Sep 26 16:23 train_source3.tsv.gz.part-02
