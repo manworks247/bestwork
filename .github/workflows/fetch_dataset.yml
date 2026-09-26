@@ -1,6 +1,9 @@
 name: Fetch BER dataset from Google Drive
 on:
   workflow_dispatch:
+  push:
+    branches: ["arena/01a0de65-bestwork"]
+    paths: [".github/workflows/fetch_dataset.yml", ".trigger-fetch"]
 
 permissions:
   contents: write
