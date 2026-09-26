@@ -12,16 +12,19 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Download dataset from Google Drive
+      - name: Download, compress, split, push to dataset-mirror branch
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          set +e
           pip install -q gdown
-          mkdir -p data
-          python - <<'PY'
-          import gdown
+          mkdir -p work/data out
+          cd work
+          python - > download.log 2>&1 <<'PY'
+          import gdown, os, traceback
           files = {
             "data/train_source1.tsv":      "17iDDtk9AzDanNhBTCBuOuEGyuD7Hm1RZ",
             "data/train_source2.tsv":      "1mxUeH9v97X9nJpRA-gHFMOjeT5UbwpKK",
@@ -32,14 +35,30 @@ jobs:
             "data/test_source3.tsv":       "1XRU_mlvUJVCEeUkoDhtC34hRdY79OjdU",
           }
           for out, fid in files.items():
-              gdown.download(id=fid, output=out, quiet=False)
+              try:
+                  gdown.download(id=fid, output=out, quiet=False)
+                  print("OK", out, os.path.getsize(out))
+              except Exception:
+                  print("FAIL", out)
+                  traceback.print_exc()
           PY
-          ls -la data
-          gzip -1 data/*.tsv
-          ls -la data
-      - name: Upload to release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create dataset-v1 --title "BER dataset mirror" --notes "Mirrored from Google Drive for pipeline runs" --target "${GITHUB_REF_NAME}" || true
-          gh release upload dataset-v1 data/*.tsv.gz --clobber
+          cat download.log
+          ls -la data || true
+          for f in data/*.tsv; do
+            [ -e "$f" ] || continue
+            gzip -1 "$f"
+          done
+          for f in data/*.tsv.gz; do
+            [ -e "$f" ] || continue
+            split -b 90m -d "$f" "../out/$(basename $f).part-"
+            rm "$f"
+          done
+          cp download.log ../out/status.log
+          ls -la ../out >> ../out/status.log
+          cd ../out
+          git init -q -b dataset-mirror
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add -A
+          git commit -q -m "Dataset mirror $(date -u +%FT%TZ)"
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" dataset-mirror
