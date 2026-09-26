@@ -1,0 +1,42 @@
+name: Fetch BER dataset from Google Drive
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download dataset from Google Drive
+        run: |
+          pip install -q gdown
+          mkdir -p data
+          python - <<'PY'
+          import gdown
+          files = {
+            "data/train_source1.tsv":      "17iDDtk9AzDanNhBTCBuOuEGyuD7Hm1RZ",
+            "data/train_source2.tsv":      "1mxUeH9v97X9nJpRA-gHFMOjeT5UbwpKK",
+            "data/train_source3.tsv":      "1mYkKYF07auePjI0X74PxTCqR42Nnua9X",
+            "data/train_ground_truth.tsv": "1YEMGKmoXSvLRJJ7e_-fhbfXpgNTb8GwX",
+            "data/test_source1.tsv":       "1eezHtRDobL9HSSszU_JdiDEgjFN3HLrE",
+            "data/test_source2.tsv":       "1caUOZ8OPejc8UqlrCX2nJRtXtNOQXfcf",
+            "data/test_source3.tsv":       "1XRU_mlvUJVCEeUkoDhtC34hRdY79OjdU",
+          }
+          for out, fid in files.items():
+              gdown.download(id=fid, output=out, quiet=False)
+          PY
+          ls -la data
+          gzip -1 data/*.tsv
+          ls -la data
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create dataset-v1 --title "BER dataset mirror" --notes "Mirrored from Google Drive for pipeline runs" --target "${GITHUB_REF_NAME}" || true
+          gh release upload dataset-v1 data/*.tsv.gz --clobber
