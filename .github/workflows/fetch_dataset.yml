@@ -20,39 +20,81 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set +e
-          pip install -q gdown
+          pip install -q gdown requests
           mkdir -p work/data out
           cd work
+          # pull already-mirrored parts so we only fetch what is missing
+          git clone -q --depth 1 -b dataset-mirror "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" prev || mkdir -p prev
           python - > download.log 2>&1 <<'PY'
-          import gdown, os, traceback
+          import os, time, glob, subprocess, requests
+
           files = {
-            "data/train_source1.tsv":      "17iDDtk9AzDanNhBTCBuOuEGyuD7Hm1RZ",
-            "data/train_source2.tsv":      "1mxUeH9v97X9nJpRA-gHFMOjeT5UbwpKK",
-            "data/train_source3.tsv":      "1mYkKYF07auePjI0X74PxTCqR42Nnua9X",
-            "data/train_ground_truth.tsv": "1YEMGKmoXSvLRJJ7e_-fhbfXpgNTb8GwX",
-            "data/test_source1.tsv":       "1eezHtRDobL9HSSszU_JdiDEgjFN3HLrE",
-            "data/test_source2.tsv":       "1caUOZ8OPejc8UqlrCX2nJRtXtNOQXfcf",
-            "data/test_source3.tsv":       "1XRU_mlvUJVCEeUkoDhtC34hRdY79OjdU",
+            "train_source1.tsv":      "17iDDtk9AzDanNhBTCBuOuEGyuD7Hm1RZ",
+            "train_source2.tsv":      "1mxUeH9v97X9nJpRA-gHFMOjeT5UbwpKK",
+            "train_source3.tsv":      "1mYkKYF07auePjI0X74PxTCqR42Nnua9X",
+            "train_ground_truth.tsv": "1YEMGKmoXSvLRJJ7e_-fhbfXpgNTb8GwX",
+            "test_source1.tsv":       "1eezHtRDobL9HSSszU_JdiDEgjFN3HLrE",
+            "test_source2.tsv":       "1caUOZ8OPejc8UqlrCX2nJRtXtNOQXfcf",
+            "test_source3.tsv":       "1XRU_mlvUJVCEeUkoDhtC34hRdY79OjdU",
           }
-          for out, fid in files.items():
-              try:
-                  gdown.download(id=fid, output=out, quiet=False)
-                  print("OK", out, os.path.getsize(out))
-              except Exception:
-                  print("FAIL", out)
-                  traceback.print_exc()
+          expected = {
+            "train_source1.tsv": 210069713, "train_source2.tsv": 489301488,
+            "train_source3.tsv": 503705637, "train_ground_truth.tsv": 127015583,
+            "test_source1.tsv": 175022086, "test_source2.tsv": 509456422,
+            "test_source3.tsv": 506002772,
+          }
+
+          def have_prev(name):
+              return sorted(glob.glob(f"prev/{name}.gz.part-*"))
+
+          def dl_direct(fid, out):
+              url = ("https://drive.usercontent.google.com/download"
+                     f"?id={fid}&export=download&confirm=t")
+              with requests.get(url, stream=True, timeout=120) as r:
+                  r.raise_for_status()
+                  ctype = r.headers.get("content-type", "")
+                  if "text/html" in ctype:
+                      raise RuntimeError(f"got html page instead of file ({ctype})")
+                  with open(out, "wb") as f:
+                      for chunk in r.iter_content(1 << 20):
+                          f.write(chunk)
+
+          for name, fid in files.items():
+              out = f"data/{name}"
+              prev = have_prev(name)
+              if prev:
+                  print("REUSE", name, prev)
+                  continue
+              ok = False
+              for attempt in range(5):
+                  try:
+                      dl_direct(fid, out)
+                      sz = os.path.getsize(out)
+                      if sz == expected[name]:
+                          print("OK", name, sz); ok = True; break
+                      print("SIZE MISMATCH", name, sz, "expected", expected[name])
+                  except Exception as e:
+                      print("ATTEMPT", attempt, name, "failed:", e)
+                  time.sleep(20 * (attempt + 1))
+              if not ok:
+                  # last resort: gdown
+                  try:
+                      import gdown
+                      gdown.download(id=fid, output=out, quiet=True)
+                      print("GDOWN", name, os.path.getsize(out))
+                  except Exception as e:
+                      print("FAIL", name, e)
           PY
           cat download.log
           ls -la data || true
           for f in data/*.tsv; do
             [ -e "$f" ] || continue
             gzip -1 "$f"
+            split -b 90m -d "$f.gz" "../out/$(basename $f).gz.part-"
+            rm "$f.gz"
           done
-          for f in data/*.tsv.gz; do
-            [ -e "$f" ] || continue
-            split -b 90m -d "$f" "../out/$(basename $f).part-"
-            rm "$f"
-          done
+          # carry over previously mirrored parts
+          cp prev/*.gz.part-* ../out/ 2>/dev/null || true
           cp download.log ../out/status.log
           ls -la ../out >> ../out/status.log
           cd ../out
