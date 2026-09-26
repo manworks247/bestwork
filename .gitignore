@@ -1,0 +1,5 @@
+google_drive/
+__pycache__/
+*.pyc
+work/
+.trigger-fetch

@@ -188,17 +188,40 @@ class Blocker:
       * each core name token             (weight ~idf, capped postings)
       * rarest name token + addr number  (weight 2)
     Candidates are ranked by accumulated key weight; top-K survive.
+
+    Implementation note: postings are kept as one flat (key-hash, record-idx)
+    pair list that is sorted once after loading (``finalize``).  Lookups use
+    binary search.  Record strings live in a single byte blob with offset
+    arrays.  This keeps memory bounded (~8 bytes/posting, zero per-string
+    overhead) so millions of records fit in well under a GB.
     """
 
     MAX_POSTING = 400          # ignore keys more frequent than this at query time
-    STORE_POSTING = 400        # stop storing beyond this many ids per key
 
     def __init__(self):
-        self.postings: Dict[str, array] = defaultdict(lambda: array("i"))
-        self.overflow: Set[str] = set()
-        self.ids: List[str] = []
-        self.names: List[str] = []
-        self.addrs: List[str] = []
+        self._kh = array("I")   # 32-bit key hashes
+        self._ki = array("i")   # record indices
+        self.sorted_h = None
+        self.sorted_i = None
+        # record storage: [id bytes | name bytes | addr bytes] per record
+        self._blob = bytearray()
+        self._offs = array("q", [0])
+        self.n_records = 0
+
+    @staticmethod
+    def _h32(key: str) -> int:
+        return hash(key) & 0xFFFFFFFF
+
+    def get(self, i: int) -> Tuple[str, str, str]:
+        """Return (entity_id, norm_name, norm_addr) for record i."""
+        o = self._offs
+        b = self._blob
+        base = 3 * i
+        return (
+            bytes(b[o[base]:o[base + 1]]).decode("utf-8"),
+            bytes(b[o[base + 1]:o[base + 2]]).decode("utf-8"),
+            bytes(b[o[base + 2]:o[base + 3]]).decode("utf-8"),
+        )
 
     # -- shared key generation ------------------------------------------------
     @staticmethod
@@ -223,34 +246,50 @@ class Blocker:
         return keys
 
     def add(self, eid: str, norm_name: str, norm_addr: str) -> None:
-        idx = len(self.ids)
-        self.ids.append(eid)
-        self.names.append(norm_name)
-        self.addrs.append(norm_addr)
+        idx = self.n_records
+        self.n_records += 1
+        blob, offs = self._blob, self._offs
+        blob += eid.encode("utf-8")
+        offs.append(len(blob))
+        blob += norm_name.encode("utf-8")
+        offs.append(len(blob))
+        blob += norm_addr.encode("utf-8")
+        offs.append(len(blob))
+        kh, ki = self._kh, self._ki
+        h32 = self._h32
         for key, _w in self.keys_for(norm_name, norm_addr):
-            if key in self.overflow:
-                continue
-            post = self.postings[key]
-            if len(post) >= self.STORE_POSTING:
-                self.overflow.add(key)
-                continue
-            post.append(idx)
+            kh.append(h32(key))
+            ki.append(idx)
+
+    def finalize(self) -> None:
+        """Sort the flat posting list once so queries can binary-search it."""
+        kh = np.asarray(self._kh, dtype=np.uint32)
+        self._kh = array("I")
+        ki = np.asarray(self._ki, dtype=np.int32)
+        self._ki = array("i")
+        order = np.argsort(kh, kind="stable")
+        self.sorted_h = kh[order]
+        kh = None
+        self.sorted_i = ki[order]
+        del ki, order
 
     def query(self, norm_name: str, norm_addr: str, top_k: int) -> List[Tuple[int, float]]:
+        if self.sorted_h is None:
+            self.finalize()
         scores: Dict[int, float] = defaultdict(float)
+        sh, si = self.sorted_h, self.sorted_i
+        h32 = self._h32
         for key, w in self.keys_for(norm_name, norm_addr):
-            if key in self.overflow:
-                continue
-            post = self.postings.get(key)
-            if post is None:
-                continue
-            n = len(post)
+            h = h32(key)
+            lo = np.searchsorted(sh, h, "left")
+            hi = np.searchsorted(sh, h, "right")
+            n = int(hi - lo)
             if n == 0 or n > self.MAX_POSTING:
                 continue
             # frequency-aware weight: rare keys count more
             kw = w * (1.0 + 2.0 / (1.0 + 0.05 * n))
-            for idx in post:
-                scores[idx] += kw
+            for idx in si[lo:hi]:
+                scores[int(idx)] += kw
         if not scores:
             return []
         items = sorted(scores.items(), key=lambda kv: -kv[1])[:top_k]

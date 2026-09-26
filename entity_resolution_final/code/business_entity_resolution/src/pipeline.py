@@ -42,12 +42,16 @@ RANDOM_SEED = 42
 # Helpers
 # ---------------------------------------------------------------------------
 
-def load_ground_truth(path: str) -> Dict[str, Set[str]]:
+def load_ground_truth(path: str, only: Set[str] = None) -> Dict[str, Set[str]]:
+    """Load ground truth; when ``only`` is given keep just those S1 entities
+    (memory saver: the full file holds >2M rows)."""
     gt: Dict[str, Set[str]] = {}
     with open(path, "r", encoding="utf-8") as f:
         header = f.readline()
         for line in f:
             s1, _, rest = line.rstrip("\n").partition("\t")
+            if only is not None and s1 not in only:
+                continue
             ids = set(x for x in rest.split(",") if x) if rest.strip() else set()
             gt[s1] = ids
     return gt
@@ -62,6 +66,7 @@ def build_index_for_country(parts: Dict[str, str]) -> Blocker:
             continue
         for eid, name, addr in read_part(p):
             blocker.add(eid, normalize_text(name), normalize_text(addr))
+    blocker.finalize()
     return blocker
 
 
@@ -73,7 +78,8 @@ def candidates_for_s1(
     hits = blocker.query(nn, na, top_k)
     out = []
     for rank, (idx, score) in enumerate(hits):
-        out.append((blocker.ids[idx], blocker.names[idx], blocker.addrs[idx], score, rank))
+        cid, cname, caddr = blocker.get(idx)
+        out.append((cid, cname, caddr, score, rank))
     return out
 
 
@@ -101,37 +107,50 @@ def run_training(
         os.path.join(work_dir, "parts_train"),
         "train",
     )
-    gt = load_ground_truth(os.path.join(data_dir, "train", "train_ground_truth.tsv"))
-    print(f"[train] ground truth entities: {len(gt):,}", flush=True)
-
-    # Sample S1 entities proportionally per country
-    country_s1: Dict[str, List[Tuple[str, str, str]]] = {}
-    total_s1 = 0
+    # Sample S1 entities proportionally per country (streaming, memory-light)
+    s1_counts: Dict[str, int] = {}
     for ck, p in parts.items():
         if "s1" not in p:
             continue
-        recs = list(read_part(p["s1"]))
-        country_s1[ck] = recs
-        total_s1 += len(recs)
+        with open(p["s1"], "r", encoding="utf-8") as f:
+            s1_counts[ck] = sum(1 for _ in f)
+    total_s1 = sum(s1_counts.values())
     frac = min(1.0, train_sample / max(1, total_s1))
     print(f"[train] S1 total {total_s1:,}; sampling ~{frac:.1%}", flush=True)
 
-    X_rows: List[List[float]] = []
+    # Pre-select the sampled entities so the ground truth can be loaded
+    # filtered (the full GT map holds >2M rows and wastes ~1 GB otherwise).
+    sampled_by_country: Dict[str, List[Tuple[str, str, str]]] = {}
+    sampled_ids: Set[str] = set()
+    for ck in s1_counts:
+        recs = [r for r in read_part(parts[ck]["s1"]) if rng.random() < frac]
+        sampled_by_country[ck] = recs
+        sampled_ids.update(r[0] for r in recs)
+    gt = load_ground_truth(
+        os.path.join(data_dir, "train", "train_ground_truth.tsv"), only=sampled_ids)
+    print(f"[train] ground truth rows kept: {len(gt):,}", flush=True)
+
+    X_chunks: List[np.ndarray] = []
     y_rows: List[int] = []
     pair_meta: List[Tuple[str, str]] = []   # (s1_id, cand_id)
     entity_split: Dict[str, int] = {}       # s1_id -> 0 train / 1 val
     truth_by_entity: Dict[str, Set[str]] = {}
+    X_buf: List[List[float]] = []
 
-    for ck in sorted(country_s1, key=lambda c: len(country_s1[c])):
-        s1_recs = country_s1[ck]
-        sampled = [r for r in s1_recs if rng.random() < frac]
+    def _flush_X():
+        if X_buf:
+            X_chunks.append(np.asarray(X_buf, dtype=np.float32))
+            X_buf.clear()
+
+    for ck in sorted(s1_counts, key=lambda c: s1_counts[c]):
+        sampled = sampled_by_country.pop(ck, [])
         if not sampled:
             continue
-        print(f"[train] country={ck}: S1={len(s1_recs):,} sampled={len(sampled):,} "
+        print(f"[train] country={ck}: S1={s1_counts[ck]:,} sampled={len(sampled):,} "
               f"— building index ...", flush=True)
         blocker = build_index_for_country(parts[ck])
-        print(f"[train]   index size: {len(blocker.ids):,} records, "
-              f"{len(blocker.postings):,} keys", flush=True)
+        print(f"[train]   index size: {blocker.n_records:,} records, "
+              f"{len(blocker.sorted_h):,} postings", flush=True)
         for i, (s1_id, name, addr) in enumerate(sampled):
             truth = gt.get(s1_id, set())
             cands = candidates_for_s1(blocker, name, addr, top_k)
@@ -143,15 +162,19 @@ def run_training(
             for cid, cname, caddr, bscore, brank in cands:
                 feats = pair_features(nn, na, cname, caddr, bscore, brank,
                                       cid.startswith("S2-"), cache)
-                X_rows.append(feats)
+                X_buf.append(feats)
                 y_rows.append(1 if cid in truth else 0)
                 pair_meta.append((s1_id, cid))
+            if len(X_buf) >= 100_000:
+                _flush_X()
             if (i + 1) % 20000 == 0:
                 print(f"[train]   {i+1:,}/{len(sampled):,} queried "
                       f"({time.time()-t0:,.0f}s)", flush=True)
         del blocker
 
-    X = np.asarray(X_rows, dtype=np.float32)
+    _flush_X()
+    X = np.concatenate(X_chunks, axis=0) if X_chunks else np.zeros((0, len(FEATURE_NAMES)), np.float32)
+    X_chunks.clear()
     y = np.asarray(y_rows, dtype=np.int8)
     is_val = np.asarray([entity_split[m[0]] for m in pair_meta], dtype=np.int8)
     print(f"[train] pairs: {len(y):,} (pos {int(y.sum()):,}) "
@@ -252,7 +275,7 @@ def run_inference(
                 continue
             print(f"[predict] country={ck}: building index ...", flush=True)
             blocker = build_index_for_country(p)
-            print(f"[predict]   index: {len(blocker.ids):,} records", flush=True)
+            print(f"[predict]   index: {blocker.n_records:,} records", flush=True)
 
             # batched scoring to keep memory flat
             buf_feats: List[List[float]] = []
@@ -289,10 +312,10 @@ def run_inference(
                 cand_ids = []
                 cache: dict = {}
                 for rank, (idx, score) in enumerate(hits):
-                    cid = blocker.ids[idx]
+                    cid, cname, caddr = blocker.get(idx)
                     cand_ids.append(cid)
                     buf_feats.append(pair_features(
-                        nn, na, blocker.names[idx], blocker.addrs[idx],
+                        nn, na, cname, caddr,
                         score, rank, cid.startswith("S2-"), cache))
                     buf_meta.append((s1_id, cid))
                 buf_entities.append((s1_id, cand_ids))
