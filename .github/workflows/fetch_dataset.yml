@@ -30,12 +30,12 @@ jobs:
 
           files = {
             "train_source1.tsv":      "17iDDtk9AzDanNhBTCBuOuEGyuD7Hm1RZ",
-            "train_source2.tsv":      "1mxUeH9v97X9nJpRA-gHFMOjeT5UbwpKK",
-            "train_source3.tsv":      "1mYkKYF07auePjI0X74PxTCqR42Nnua9X",
-            "train_ground_truth.tsv": "1YEMGKmoXSvLRJJ7e_-fhbfXpgNTb8GwX",
+            "train_source2.tsv":      "1TMiPUIxSq1yRGFoL7y3XnsSNJJXKEt5e",
+            "train_source3.tsv":      "1ecxJIy2Styerli8U141NoYd9i74XFEz3",
+            "train_ground_truth.tsv": "1VFVRqCGVNWq17eWSzOMq2vfy_5vSMroW",
             "test_source1.tsv":       "1eezHtRDobL9HSSszU_JdiDEgjFN3HLrE",
-            "test_source2.tsv":       "1caUOZ8OPejc8UqlrCX2nJRtXtNOQXfcf",
-            "test_source3.tsv":       "1XRU_mlvUJVCEeUkoDhtC34hRdY79OjdU",
+            "test_source2.tsv":       "1wwmqPOfmQsMACaAPucDCymVbIN1HQUfn",
+            "test_source3.tsv":       "1Ic2ExQwXVlOCik0VWijCL6DrGERqDbFb",
           }
           expected = {
             "train_source1.tsv": 210069713, "train_source2.tsv": 489301488,

@@ -254,7 +254,11 @@ class Blocker:
         if not scores:
             return []
         items = sorted(scores.items(), key=lambda kv: -kv[1])[:top_k]
-        return items
+        # prune weak tail candidates: keeps the candidate set small without
+        # hurting recall (they virtually never survive the matcher anyway)
+        best = items[0][1]
+        floor = max(2.0, 0.30 * best)
+        return [it for it in items if it[1] >= floor]
 
 
 # ---------------------------------------------------------------------------
