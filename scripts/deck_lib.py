@@ -182,15 +182,20 @@ def new_slide(prs, bg=WHITE):
     rect(s, 0, 0, PAGE_W, PAGE_H, fill=bg, shape=MSO_SHAPE.RECTANGLE)
     return s
 
-def header(slide, section, title, sub=None, session=None, tag_color=BLUE):
+def header(slide, section, title, sub=None, session=None, tag_color=BLUE,
+           session_link=None):
     """Draws the standard content-slide header. Returns the y where content may start."""
-    text(slide, MX, 0.34, 6.6, 0.20,
+    text(slide, MX, 0.34, 6.2, 0.20,
          [{"text": section.upper(), "size": 8.0, "color": tag_color, "weight": 700,
            "spc": 1.5, "line": 1.0}], label="section")
     if session:
-        text(slide, PAGE_W - MX - 4.6, 0.34, 4.6, 0.20,
-             [{"text": session.upper(), "size": 7.6, "color": MUTED, "weight": 600, "spc": 1.1,
-               "line": 1.0, "align": "r"}], align="r", label="session")
+        st = text(slide, PAGE_W - MX - 5.4, 0.34, 5.4, 0.20,
+                  [{"text": session.upper(), "size": 7.6,
+                    "color": BLUE if session_link else MUTED,
+                    "weight": 600, "spc": 1.1, "line": 1.0, "align": "r"}],
+                  align="r", label="session")
+        if session_link:
+            link_run(slide, st, session_link)
     th = measure([{"text": title, "size": 23, "weight": 700, "line": 1.12}], CW - 0.6)
     text(slide, MX, 0.58, CW, max(th, 0.42),
          [{"text": title, "size": 23, "color": NAVY, "weight": 700, "line": 1.12}], label="title")
@@ -218,6 +223,16 @@ def footer(slide, page, total=9):
     text(slide, PAGE_W - MX - 1.10, 7.08, 1.10, 0.18,
          [{"text": f"Page {page} of {total}", "size": 7.8, "color": MUTED, "weight": 600,
            "line": 1.0, "align": "r"}], align="r", label="foot-page")
+
+
+def link_run(slide, shape, url):
+    """Attach a hyperlink to every run of a text box (keeps the visible styling)."""
+    for para in shape.text_frame.paragraphs:
+        for run in para.runs:
+            try:
+                run.hyperlink.address = url
+            except Exception as exc:      # pragma: no cover
+                print("  ! link failed:", exc)
 
 
 def bottom_line(slide, runs_or_text, y=6.44, fill=BLUE_L, accent=BLUE, label="BOTTOM LINE"):

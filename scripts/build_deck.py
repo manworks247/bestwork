@@ -9,6 +9,7 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 A = os.path.join(HERE, "assets")
 OUT = os.path.join(HERE, "Zenith-V_Launch_Decision_JGaneshKumarReddy_23BDS024.pptx")
 TOTAL = 9
+LINKS = {'S5': 'https://youtu.be/T25QYasiVrM', 'S6': 'https://youtu.be/d7Qw3Bu-23E', 'S7': 'https://youtu.be/f91JEkm7XZg', 'S8': 'https://youtu.be/LsGQdSKB80o', 'S9': 'https://youtu.be/Y_NwyfpzUIo'}
 
 def dims(p):
     w, h = Image.open(p).size
@@ -81,18 +82,28 @@ def s1(prs):
     text(s, MX + 0.24, 5.56, 1.85, 0.2,
          [{"text": "LECTURE COVERAGE", "size": 7.4, "color": BLUE, "weight": 700, "spc": 1.2,
            "line": 1.0}], label="cov")
-    text(s, MX + 0.24, 5.78, CW - 0.48, 0.36,
-         [{"runs": [("Session 5 ", {"weight": 700, "color": NAVY}),
-                    ("Pricing Strategies", {}), ("   ·   ", {"color": BLUE_M}),
-                    ("Session 6 ", {"weight": 700, "color": NAVY}), ("Profit", {}),
-                    ("   ·   ", {"color": BLUE_M}),
-                    ("Session 7 ", {"weight": 700, "color": NAVY}), ("Game Theory", {}),
-                    ("   ·   ", {"color": BLUE_M}),
-                    ("Session 8 ", {"weight": 700, "color": NAVY}), ("Risk", {}),
-                    ("   ·   ", {"color": BLUE_M}),
-                    ("Session 9 ", {"weight": 700, "color": NAVY}),
-                    ("Capital Budgeting & Fiscal Policy", {})],
-           "size": 9.4, "color": BODY, "line": 1.35}], label="cov2")
+    sessions = [("Session 5", "Pricing Strategies", LINKS["S5"]),
+                ("Session 6", "Profit", LINKS["S6"]),
+                ("Session 7", "Game Theory", LINKS["S7"]),
+                ("Session 8", "Risk", LINKS["S8"]),
+                ("Session 9", "Capital Budgeting & Fiscal Policy", LINKS["S9"])]
+    cx = MX + 0.24
+    base_y = 5.78
+    for i, (num, name, url) in enumerate(sessions):
+        if i:
+            text(s, cx, base_y, 0.30, 0.24,
+                 [{"text": "·", "size": 9.4, "color": BLUE_M, "line": 1.3}], label="sep")
+            cx += 0.30
+        t1 = text(s, cx, base_y, 0.72, 0.24,
+                  [{"text": num, "size": 9.0, "color": NAVY, "weight": 700, "line": 1.3}],
+                  label="snum")
+        link_run(s, t1, url)
+        cx += 0.74
+        wname = text_w(name, 9.0, 400) / 72.0
+        t2 = text(s, cx, base_y, wname + 0.06, 0.24,
+                  [{"text": name, "size": 9.0, "color": BODY, "line": 1.3}], label="sname")
+        link_run(s, t2, url)
+        cx += wname + 0.10
 
     text(s, MX, 6.62, CW, 0.24,
          [{"text": "This deck answers the three tasks in the assignment brief: market and demand "
@@ -107,7 +118,8 @@ def s2(prs):
     top = header(s, "1 · Market & demand analysis", "Why this market is an oligopoly",
                  "Four firms sell 86% of India's electric scooters, each sets price by watching "
                  "the others, and entry costs ₹200 crore.",
-                 session="Lecture link · Session 7: Game theory")
+                 session="Lecture link · Session 7: Game theory",
+                 session_link=LINKS["S7"])
 
     x, w = MX, 6.35
     rows = [
@@ -128,9 +140,9 @@ def s2(prs):
     geo = []
     for head, body in rows:
         hp = [{"text": head, "size": 11.2, "color": NAVY, "weight": 700, "line": 1.18}]
-        bp = [{"text": body, "size": 9.6, "color": BODY, "line": 1.30}]
+        bp = [{"text": body, "size": 9.9, "color": BODY, "line": 1.32}]
         geo.append((head, body, hp, bp, measure(hp, w - 0.44), measure(bp, w - 0.44)))
-    block_h = sum(g[4] + g[5] for g in geo) + 0.34 * (len(geo) - 1)
+    block_h = sum(g[4] + g[5] for g in geo) + 0.50 * (len(geo) - 1)
     y = top + 0.06
     for i, (head, body, hp, bp, hh, bh) in enumerate(geo):
         text(s, x, y + 0.02, 0.34, 0.26,
@@ -139,14 +151,17 @@ def s2(prs):
         text(s, x + 0.42, y - 0.02, w - 0.42, hh, hp, label=head[:16])
         text(s, x + 0.42, y - 0.02 + hh + 0.04, w - 0.42, bh, bp, label=head[:16] + "b")
         if i < len(geo) - 1:
-            hline(s, x, y + hh + bh + 0.17, w - 0.20, LINE, 0.6)
-        y += hh + bh + 0.34
+            hline(s, x, y + hh + bh + 0.24, w - 0.20, LINE, 0.6)
+        y += hh + bh + 0.50
 
-    text(s, x, y + 0.06, w, 0.58,
+    dy = 5.52
+    rect(s, x, dy, w, 0.68, fill=GREY_L, line=LINE, lw=0.6, radius=0.04)
+    rect(s, x, dy, 0.045, 0.68, fill=NAVY, shape=MSO_SHAPE.RECTANGLE)
+    text(s, x + 0.22, dy, w - 0.44, 0.68,
          [{"runs": [("Definition check:  ", {"weight": 700, "color": NAVY}),
                     ("not perfect competition — only four price-makers, and entry is not free. "
                      "Not a monopoly — no single firm can dictate price.", {})],
-           "size": 9.2, "color": BODY, "line": 1.30}], label="defn")
+           "size": 9.2, "color": BODY, "line": 1.30}], anchor="m", label="defn")
 
     cw = 5.05
     chh = cw / dims(f"{A}/chart_market_share.png")
@@ -172,15 +187,16 @@ def s3(prs):
     top = header(s, "1 · Market & demand analysis", "How petrol prices move our demand",
                  "Petrol is the complement that makes a scooter run. When petrol gets dearer, the "
                  "petrol option loses its cost advantage and demand for Zenith-V rises.",
-                 session="Lecture link · Session 5: Pricing strategies")
+                 session="Lecture link · Session 5: Pricing strategies",
+                 session_link=LINKS["S5"])
 
-    cw = 5.92
+    cw = 6.62
     chh = cw / dims(f"{A}/chart_demand_shift.png")
-    picture(s, f"{A}/chart_demand_shift.png", MX, top - 0.06, w=cw, h=chh)
+    picture(s, f"{A}/chart_demand_shift.png", MX, top - 0.10, w=cw, h=chh)
 
     # elasticity strip spans the full width beneath the chart and the cards
-    ey = 5.58
-    eh = 0.72
+    ey = 5.66
+    eh = 0.80
     rect(s, MX, ey, CW, eh, fill=GREY_L, line=LINE, lw=0.6, radius=0.04)
     text(s, MX + 0.20, ey, 1.72, eh,
          [{"text": "OWN-PRICE\nELASTICITY", "size": 7.8, "color": BLUE, "weight": 700,
@@ -193,8 +209,8 @@ def s3(prs):
                     ("That is why price is our strongest lever.", {"weight": 700, "color": NAVY})],
            "size": 8.8, "color": BODY, "line": 1.28}], anchor="m", label="elast-b")
 
-    x = PAGE_W - MX - 5.16
-    w = 5.16
+    x = PAGE_W - MX - 5.06
+    w = 5.06
     y = top - 0.06
     blocks = [
         ("Petrol is a complement", BLUE, BLUE_L,
@@ -216,15 +232,15 @@ def s3(prs):
     ]
     for head, col, bg, runs in blocks:
         hp = [{"text": head, "size": 10.6, "color": NAVY, "weight": 700, "line": 1.2}]
-        rr = [(t, dict({"size": 9.2, "color": BODY}, **o)) for t, o in runs]
-        bp = [{"runs": rr, "size": 9.2, "color": BODY, "line": 1.30}]
+        rr = [(t, dict({"size": 9.5, "color": BODY}, **o)) for t, o in runs]
+        bp = [{"runs": rr, "size": 9.5, "color": BODY, "line": 1.34}]
         hh, bh = measure(hp, w - 0.46), measure(bp, w - 0.46)
-        ch = hh + bh + 0.36
+        ch = hh + bh + 0.44
         rect(s, x, y, w, ch, fill=bg, line=None, radius=0.04)
         rect(s, x, y, 0.045, ch, fill=col, shape=MSO_SHAPE.RECTANGLE)
-        text(s, x + 0.22, y + 0.15, w - 0.44, hh, hp, label=head[:14])
-        text(s, x + 0.22, y + 0.15 + hh + 0.05, w - 0.44, bh, bp, label=head[:14] + "b")
-        y += ch + 0.16
+        text(s, x + 0.22, y + 0.18, w - 0.44, hh, hp, label=head[:14])
+        text(s, x + 0.22, y + 0.18 + hh + 0.06, w - 0.44, bh, bp, label=head[:14] + "b")
+        y += ch + 0.20
 
     footer(s, 3, TOTAL)
     return s
@@ -235,7 +251,8 @@ def s4(prs):
     top = header(s, "2 · Pricing & game theory", "Recommendation: penetration at ₹74,999",
                  "The choice is not margin versus growth. At ₹74,999 we still earn ₹14,999 on "
                  "every scooter, so penetration is a decision for scale — not a loss leader.",
-                 session="Lecture link · Session 5: Pricing strategies")
+                 session="Lecture link · Session 5: Pricing strategies",
+                 session_link=LINKS["S5"])
 
     bh = 0.56
     rect(s, MX, top - 0.04, CW, bh, fill=BLUE_L, line=BLUE_M, lw=0.6, radius=0.04)
@@ -250,7 +267,7 @@ def s4(prs):
     ty = top + 0.68
     col0, colw = 2.02, 2.14
     tw = col0 + colw * 2
-    head_h, row_h = 0.36, 0.44
+    head_h, row_h = 0.36, 0.47
     rect(s, MX, ty, tw, head_h, fill=NAVY, radius=0.0)
     text(s, MX + col0, ty, colw, head_h,
          [{"text": "PENETRATION   ←  RECOMMENDED", "size": 7.8, "color": WHITE, "weight": 700,
@@ -287,7 +304,7 @@ def s4(prs):
              "Experience curve: each doubling of output cuts cell costs 15–20%, widening the "
              "margin by year three.",
              "Deterrence: at ₹74,999 there is little room left for a rival to start a price war."]
-    bullets(s, MX, ay + 0.24, tw, items, size=8.8, gap=0.055, marker="▪", label="why-item")
+    bullets(s, MX, ay + 0.25, tw, items, size=8.9, gap=0.085, marker="▪", label="why-item")
 
     cw = 4.90
     chh = cw / dims(f"{A}/chart_price_tradeoff.png")
@@ -298,7 +315,7 @@ def s4(prs):
          "question is which volume the market will let us sell.", size=8.4)
 
     # KPI strip
-    ky, kh = 6.14, 0.62
+    ky, kh = 6.16, 0.62
     kpis = [("₹74,999", "launch price, ex-showroom"),
             ("₹14,999", "contribution per unit  ·  25% mark-up"),
             ("1.33 lakh", "units to recover ₹200 crore"),
@@ -321,7 +338,8 @@ def s5(prs):
     top = header(s, "2 · Pricing & game theory", "How Ola and Ather are likely to react",
                  "Strategic interdependence: a rival's best price depends on ours. Our launch "
                  "changes their payoffs, so their reaction is part of our decision.",
-                 session="Lecture link · Session 7: Game theory")
+                 session="Lecture link · Session 7: Game theory",
+                 session_link=LINKS["S7"])
 
     lw_, cw_, g = 1.56, 1.92, 0.08
     x0 = MX
@@ -337,7 +355,7 @@ def s5(prs):
         text(s, cx, y0, cw_, hh, [{"text": lab, "size": 7.3, "color": BODY, "weight": 700,
                                    "spc": 0.7, "line": 1.0, "align": "c"}],
              align="c", anchor="m", label="colh")
-    cellh = 1.16
+    cellh = 1.32
     rows = [("WE PENETRATE", "₹74,999"), ("WE SKIM", "₹1,10,000")]
     cells = [[("(25, 30)", "price war, margins thin", "nash"),
               ("(45, 18)", "we take the volume", "plain")],
@@ -358,15 +376,15 @@ def s5(prs):
             else:
                 fill, border = WHITE, LINE
             rect(s, cx, ry, cw_, cellh, fill=fill, line=border, lw=0.9, radius=0.0)
-            text(s, cx, ry + 0.20, cw_, 0.32,
+            text(s, cx, ry + 0.26, cw_, 0.32,
                  [{"text": pay, "size": 15.5, "color": NAVY, "weight": 700, "line": 1.0,
                    "align": "c"}], align="c", label="pay")
-            text(s, cx, ry + 0.62, cw_, 0.26,
+            text(s, cx, ry + 0.70, cw_, 0.26,
                  [{"text": desc, "size": 7.3, "color": MUTED, "line": 1.1, "align": "c"}],
                  align="c", label="desc")
             if kind == "nash":
                 pw = pill_w("NASH EQUILIBRIUM", 6.2, 700, 0.6, pad=0.12)
-                pill(s, cx + (cw_ - pw) / 2, ry + cellh - 0.26, "NASH EQUILIBRIUM",
+                pill(s, cx + (cw_ - pw) / 2, ry + cellh - 0.29, "NASH EQUILIBRIUM",
                      BLUE, WHITE, size=6.2, spc=0.6, h=0.19, pad=0.12)
     gy = y0 + hh + g + 2 * (cellh + g) + 0.06
     text(s, x0, gy, lw_ + cw_ * 2 + g * 2, 0.72,
@@ -406,8 +424,8 @@ def s5(prs):
         text(s, x + 0.20, sy + 0.17, w - 0.20, bh_, bp, label="step")
         sy += 0.17 + bh_ + 0.22
 
-    cy = max(sy + 0.04, 4.92)
-    ch = 6.32 - cy
+    cy = max(sy + 0.04, 4.78)
+    ch = 6.30 - cy
     rect(s, x, cy, w, ch, fill=TEAL_L, line=RGBColor(0xBF, 0xDD, 0xD7), lw=0.6, radius=0.04)
     text(s, x + 0.20, cy + 0.11, w - 0.40, 0.2,
          [{"text": "OUR COUNTER-MOVES", "size": 7.6, "color": TEAL, "weight": 700, "spc": 1.1,
@@ -434,7 +452,8 @@ def s6(prs):
     top = header(s, "3 · Capital budgeting", "A ₹50 crore NPV means the IRR is above 15%",
                  "If the project is worth ₹50 crore more than it costs at a 15% discount rate, "
                  "its own rate of return must be higher than 15%.",
-                 session="Lecture link · Sessions 8 & 9: Risk · Capital budgeting")
+                 session="Lecture link · Sessions 8 & 9: Risk · Capital budgeting",
+                 session_link=LINKS["S8"])
 
     x, w = MX, 6.25
     steps = [
@@ -502,9 +521,9 @@ def s6(prs):
          "consolidation among rivals · a lithium supply shock · a lasting change in buyer taste. "
          "Met with staged capex and written exit rules."),
     ]
-    cy = hy + 0.24
+    cy = hy + 0.22
     cwid = (CW - 0.26) / 2
-    chgt = 1.08
+    chgt = 1.04
     for i, (tag, sub, col, bg, txt) in enumerate(cards):
         cx2 = MX + i * (cwid + 0.26)
         rect(s, cx2, cy, cwid, chgt, fill=bg, line=None, radius=0.04)
@@ -518,7 +537,7 @@ def s6(prs):
 
     bottom_line(s, [("mainly uncertainty — the ₹50 crore NPV is a point estimate inside a "
                      "distribution, not a promise.", {"size": 9.0, "color": NAVY})],
-                y=6.22, label="VERDICT")
+                y=6.26, label="VERDICT")
     footer(s, 6, TOTAL)
     return s
 
@@ -528,7 +547,7 @@ def s7(prs):
     top = header(s, "4 · Conclusion", "Proceed — with a staged commitment",
                  "All three analyses point the same way. The one refinement is to release capital "
                  "in stages, because the plant is a bet under uncertainty.",
-                 session="Lecture link · Sessions 5–9")
+                 session="Sessions 5–9 · recap")
 
     cards = [
         ("MARKET", "Oligopoly", "86% held by four firms. Enter as a differentiated, scale-led "
@@ -655,7 +674,7 @@ def s8(prs):
     ]
     x, w = MX, CW
     y = top
-    rowh = 0.352
+    rowh = 0.42
     text(s, x + 0.14, y, 4.4, 0.2, [{"text": "INPUT", "size": 7.4, "color": MUTED, "weight": 700,
                                      "spc": 1.1, "line": 1.0}], label="h1")
     text(s, x + 5.10, y, 4.9, 0.2, [{"text": "VALUE", "size": 7.4, "color": MUTED, "weight": 700,
@@ -716,7 +735,7 @@ def s9(prs):
             hlink.text_frame.paragraphs[0].runs[0].hyperlink.address = link
         except Exception:
             pass
-        y += 0.72
+        y += 0.68
         hline(s, x, y - 0.14, w, LINE, 0.6)
 
     # rubric map
@@ -754,26 +773,45 @@ def s9(prs):
              [{"text": where, "size": 7.4, "color": MUTED, "line": 1.0, "align": "c"}],
              align="c", anchor="m", label="tw")
 
-    ny = ty + hh + len(tbl) * rh + 0.18
-    rect(s, rx, ny, rw, 1.05, fill=GREY_L, line=LINE, lw=0.6, radius=0.04)
-    text(s, rx + 0.20, ny + 0.14, rw - 0.40, 0.78,
-         [{"text": "NOTE ON THE DATA", "size": 7.2, "color": BLUE, "weight": 700, "spc": 1.0,
-           "line": 1.0},
-          {"text": "Market shares are FY25 VAHAN-based industry estimates, used to establish the "
-                   "market structure — not to forecast our own volumes. The IRR is illustrative, "
-                   "since the brief supplies only the NPV at 15%.",
-           "size": 8.4, "color": BODY, "line": 1.28, "sb": 4}], label="datanote")
-
-    dy = 5.62
-    rect(s, x, dy, w, 0.86, fill=BLUE_L, line=BLUE_M, lw=0.6, radius=0.04)
-    rect(s, x, dy, 0.05, 0.86, fill=BLUE, shape=MSO_SHAPE.RECTANGLE)
-    text(s, x + 0.22, dy + 0.12, w - 0.44, 0.62,
+    dy = y + 0.20
+    rect(s, x, dy, w, 0.98, fill=BLUE_L, line=BLUE_M, lw=0.6, radius=0.04)
+    rect(s, x, dy, 0.05, 0.98, fill=BLUE, shape=MSO_SHAPE.RECTANGLE)
+    text(s, x + 0.22, dy + 0.16, w - 0.44, 0.66,
          [{"text": "DECLARATION", "size": 7.2, "color": BLUE, "weight": 700, "spc": 1.0,
            "line": 1.0},
           {"text": "This assignment is my own work, prepared from the recorded sessions and the "
                    "case brief, and is submitted on or before the deadline set in Google "
                    "Classroom.", "size": 8.4, "color": BODY, "line": 1.26, "sb": 4}],
          label="decl")
+
+    # right column: one-line answers, then a short data note
+    ny = ty + hh + len(tbl) * rh + 0.22
+    text(s, rx, ny, rw, 0.2,
+         [{"text": "THE WHOLE ARGUMENT IN FOUR LINES", "size": 7.6, "color": BLUE, "weight": 700,
+           "spc": 1.1, "line": 1.0}], label="oneline")
+    lines = [("Market", "four firms, 86% share, mutual dependence → oligopoly"),
+             ("Demand", "petrol is a complement, so higher petrol shifts our demand right"),
+             ("Pricing", "penetration at ₹74,999; rivals match, margin settles lower"),
+             ("Capital", "+₹50 cr NPV at 15% → IRR ≈ 21.3% → accept, in stages")]
+    oy = ny + 0.26
+    for k, v in lines:
+        text(s, rx, oy, 0.94, 0.2,
+             [{"text": k, "size": 8.6, "color": NAVY, "weight": 700, "line": 1.15}],
+             label="ol-k")
+        p_ = [{"text": v, "size": 8.6, "color": BODY, "line": 1.24}]
+        h_ = measure(p_, rw - 1.02)
+        text(s, rx + 1.00, oy, rw - 1.00, h_, p_, label="ol-v")
+        oy += h_ + 0.10
+
+    rect(s, rx, oy + 0.16, rw, 1.00, fill=GREY_L, line=LINE, lw=0.6, radius=0.04)
+    text(s, rx + 0.18, oy + 0.16, rw - 0.36, 1.00,
+         [{"text": "NOTE ON THE DATA", "size": 7.0, "color": BLUE, "weight": 700, "spc": 1.0,
+           "line": 1.0},
+          {"text": "Market shares are FY25 VAHAN-based industry estimates, used to establish the "
+                   "market structure — not to forecast our own volumes. The IRR is illustrative, "
+                   "since the brief supplies only the NPV at 15%.",
+           "size": 8.2, "color": BODY, "line": 1.30, "sb": 4}], label="datanote")
+
     footer(s, 9, TOTAL)
     return s
 
