@@ -803,14 +803,12 @@ def s9(prs):
         text(s, rx + 1.00, oy, rw - 1.00, h_, p_, label="ol-v")
         oy += h_ + 0.10
 
-    rect(s, rx, oy + 0.16, rw, 1.00, fill=GREY_L, line=LINE, lw=0.6, radius=0.04)
-    text(s, rx + 0.18, oy + 0.16, rw - 0.36, 1.00,
-         [{"text": "NOTE ON THE DATA", "size": 7.0, "color": BLUE, "weight": 700, "spc": 1.0,
-           "line": 1.0},
-          {"text": "Market shares are FY25 VAHAN-based industry estimates, used to establish the "
-                   "market structure — not to forecast our own volumes. The IRR is illustrative, "
-                   "since the brief supplies only the NPV at 15%.",
-           "size": 8.2, "color": BODY, "line": 1.30, "sb": 4}], label="datanote")
+    hline(s, rx, oy + 0.14, rw, LINE, 0.6)
+    text(s, rx, oy + 0.26, rw, 0.62,
+         [{"text": "Note: market shares are FY25 VAHAN-based industry estimates, used to establish "
+                   "the market structure — not to forecast our own volumes. The IRR is "
+                   "illustrative, since the brief supplies only the NPV at 15%.",
+           "size": 8.0, "color": MUTED, "italic": True, "line": 1.30}], label="datanote")
 
     footer(s, 9, TOTAL)
     return s

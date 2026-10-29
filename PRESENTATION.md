@@ -29,7 +29,8 @@ Every reference to the recorded sessions is a live hyperlink inside the .pptx:
 
 - Slide 1 — the five session numbers **and** the five session names in the "Lecture coverage" strip.
 - Slides 2–6 — the `LECTURE LINK · SESSION …` tag in the top-right corner
-  (s2 → Session 7, s3 → Session 5, s4 → Session 5, s5 → Session 7, s6 → Session 8).
+  (s2 → Session 7, s3 → Session 5, s4 → Session 5, s5 → Session 7, s6 → Session 8);
+  slide 7 is a recap so its tag stays plain text.
 - Slide 9 — the five raw URLs in Appendix B.
 
 | Session | Title | Link |
@@ -40,7 +41,7 @@ Every reference to the recorded sessions is a live hyperlink inside the .pptx:
 | 8 | Risk | https://youtu.be/LsGQdSKB80o |
 | 9 | Capital Budgeting & Fiscal Policy | https://youtu.be/Y_NwyfpzUIo |
 
-Verify with: `python3 -c "from pptx import Presentation; ..."` (18 link runs in total: 10 + 1 + 1 + 1 + 1 + 1 + 5).
+Verify with: `python3 -c "from pptx import Presentation; ..."` (20 link runs in total: 10 + 1 + 1 + 1 + 1 + 1 + 5).
 
 ## Numbers used
 
