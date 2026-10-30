@@ -1,0 +1,50 @@
+{
+  "report_date": "2026-10-30",
+  "student": {
+    "name": "J GANESH KUMAR REDDY",
+    "id": "23BDS024"
+  },
+  "runtime": {
+    "python": "3.11.2",
+    "torch": "2.2.2",
+    "cuda_available": false,
+    "cpu_cores": 2,
+    "host_memory_gib": 3.85
+  },
+  "revisions": {
+    "pointnet2": "eb64fe0b4c24055559cea26299cb485dcb43d8dd",
+    "meshcnn": "5bf0b899d48eb204b9b73bc1af381be20f4d7df1"
+  },
+  "pointnet2": {
+    "train_examples": 2,
+    "test_examples": 40,
+    "epochs": 1,
+    "points": 512,
+    "train_accuracy": 0.0,
+    "test_instance_accuracy": 0.025,
+    "test_class_accuracy": 0.025,
+    "full_run_exit": 1,
+    "smoke_exit": 0
+  },
+  "voxel": {
+    "grid_size": 32,
+    "occupied_cells": 24389,
+    "total_cells": 32768,
+    "cnn_logits": "(1, 10)",
+    "predicted_index": 7
+  },
+  "meshcnn": {
+    "vertices": 42,
+    "triangles": 80,
+    "edges": 120,
+    "loss": 3.177232,
+    "smoke_exit": 0
+  },
+  "conversions": {
+    "sampled_points": 4096,
+    "hull_vertices": 106,
+    "hull_faces": 208,
+    "occupied_voxels": 24389,
+    "voxel_points": 24389
+  }
+}

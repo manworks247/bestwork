@@ -1,0 +1,4 @@
+PointNet++ (yanx27/Pointnet_Pointnet2_pytorch): eb64fe0b4c24055559cea26299cb485dcb43d8dd
+MeshCNN (ranahanocka/MeshCNN): 5bf0b899d48eb204b9b73bc1af381be20f4d7df1
+PointNet++ README/implementation source: https://github.com/yanx27/Pointnet_Pointnet2_pytorch
+MeshCNN README/implementation source: https://github.com/ranahanocka/MeshCNN

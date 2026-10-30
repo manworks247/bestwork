@@ -1,0 +1,14 @@
+Deterministic smoke-test fixtures prepared (not ModelNet/SHREC data).
+  Synthetic ModelNet40 layout: /home/user/bestwork/ganeshlaptop/data/synthetic_modelnet40_normal_resampled
+  Train examples: 2 across 2 classes; test examples: 40 across 40 classes
+  ModelNet10-style OFF mesh: /home/user/bestwork/ganeshlaptop/data/ModelNet10/chair/train/chair_0001.off
+  MeshCNN triangular OBJ: /home/user/bestwork/ganeshlaptop/data/meshcnn_fixture/icosphere.obj
+Section 7.3 | mesh-to-voxel + CNN forward pass
+Mesh fixture: data/ModelNet10/chair/train/chair_0001.off (synthetic closed cube, 12 triangles)
+Voxel grid: (32, 32, 32); occupied cells: 24389/32768 (74.43%)
+Tensor shape (B,C,D,H,W): (1, 1, 32, 32, 32); dtype=torch.float32
+Device: cpu; CUDA available: False
+Output logits shape: (1, 10) (10 classes)
+Predicted class index (untrained demo head): 7
+STATUS: PASS — conversion and forward shape checked; synthetic fixture only, no ModelNet10 accuracy claimed.
+EXIT_CODE=0

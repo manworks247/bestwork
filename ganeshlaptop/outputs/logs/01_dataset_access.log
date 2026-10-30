@@ -1,0 +1,4 @@
+$ curl -I -L --max-time 12 https://shapenet.cs.stanford.edu/media/modelnet40_normal_resampled.zip
+curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to shapenet.cs.stanford.edu:443
+$ curl -I -L --max-time 12 http://3dvision.princeton.edu/projects/2014/3DShapeNets/ModelNet10.zip
+curl: (52) Empty reply from server
