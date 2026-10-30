@@ -63,8 +63,11 @@ ax.annotate("", xy=(q1, yq), xytext=(q0, yq),
             arrowprops=dict(arrowstyle="-|>", color=TEAL, lw=2.0, mutation_scale=16))
 ax.plot([q0, q0], [0, yq], ls=(0, (3, 3)), color="#A9B6C7", lw=1.0)
 ax.plot([q1, q1], [0, yq], ls=(0, (3, 3)), color=TEAL, lw=1.0, alpha=0.6)
-ax.annotate("Q₀", (q0 - 0.32, 5), fontsize=9.6, color="#6B7C93", fontweight="bold")
-ax.annotate("Q₁", (q1 - 0.32, 5), fontsize=9.6, color=TEAL, fontweight="bold")
+# labels sit clear of the dashed guide lines (right of Q0, left of Q1)
+ax.annotate("Q₀", (q0 + 0.22, 6), fontsize=9.6, color="#6B7C93", fontweight="bold",
+            ha="left", va="center")
+ax.annotate("Q₁", (q1 - 0.22, 6), fontsize=9.6, color=TEAL, fontweight="bold",
+            ha="right", va="center")
 ax.text(3.4, 30, "same price,\nhigher quantity", fontsize=9.4, color=TEAL,
         fontweight="bold", ha="center", linespacing=1.4)
 ax.set_xlim(0, 12); ax.set_ylim(0, 152)

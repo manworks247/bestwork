@@ -9,6 +9,9 @@ slide (title block on slide 1, running footer on slides 2–9).
 
 ## Slide map
 
+Slide tags now repeat the brief's own slide names (Slide 2 · Market structure analysis …),
+so the deck maps one-to-one onto the assignment wording.
+
 | # | Slide | Rubric component |
 | --- | --- | --- |
 | 1 | Title — institution, submitted by/to, lecture coverage | Presentation quality |
@@ -21,7 +24,8 @@ slide (title block on slide 1, running footer on slides 2–9).
 | 8 | Appendix A — every assumption and calculation | Capital budgeting (35) |
 | 9 | Appendix B — recorded sessions used, rubric map, declaration | Presentation quality |
 
-Speaker notes are attached to all nine slides.
+Speaker notes are attached to all nine slides, each ending with the lecture session it draws on
+(with the link).
 
 ## Lecture links (clickable in the deck)
 
@@ -40,6 +44,9 @@ Every reference to the recorded sessions is a live hyperlink inside the .pptx:
 | 7 | Game Theory | https://youtu.be/f91JEkm7XZg |
 | 8 | Risk | https://youtu.be/LsGQdSKB80o |
 | 9 | Capital Budgeting & Fiscal Policy | https://youtu.be/Y_NwyfpzUIo |
+
+Every link carries a tooltip ("Watch Session 5 — Pricing Strategies", "Open the recorded lecture
+session"), and every chart carries alt text for screen readers.
 
 Verify with: `python3 -c "from pptx import Presentation; ..."` (20 link runs in total: 10 + 1 + 1 + 1 + 1 + 1 + 5).
 

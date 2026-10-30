@@ -39,7 +39,8 @@ def s1(prs):
     # hero image card (right)
     iw = 5.12
     ih = iw / dims(f"{A}/hero_card.png")
-    picture(s, f"{A}/hero_card.png", PAGE_W - MX - iw, 1.22, w=iw, h=ih)
+    picture(s, f"{A}/hero_card.png", PAGE_W - MX - iw, 1.22, w=iw, h=ih,
+            alt="The Zenith-V electric scooter — product image used on the title slide")
     text(s, PAGE_W - MX - iw, 1.22 + ih + 0.10, iw, 0.22,
          [{"text": "The Zenith-V — flagship electric scooter of E-Mobility India, Bengaluru",
            "size": 8.6, "color": MUTED, "italic": True, "line": 1.2}], label="imgcap")
@@ -97,25 +98,27 @@ def s1(prs):
         t1 = text(s, cx, base_y, 0.72, 0.24,
                   [{"text": num, "size": 9.0, "color": NAVY, "weight": 700, "line": 1.3}],
                   label="snum")
-        link_run(s, t1, url)
+        link_run(s, t1, url, tip=f"Watch {num} — {name}")
         cx += 0.74
         wname = text_w(name, 9.0, 400) / 72.0
         t2 = text(s, cx, base_y, wname + 0.06, 0.24,
                   [{"text": name, "size": 9.0, "color": BODY, "line": 1.3}], label="sname")
-        link_run(s, t2, url)
+        link_run(s, t2, url, tip=f"Watch {num} — {name}")
         cx += wname + 0.10
 
-    text(s, MX, 6.62, CW, 0.24,
-         [{"text": "This deck answers the three tasks in the assignment brief: market and demand "
-                   "analysis, pricing and game theory, and capital budgeting.",
-           "size": 8.8, "color": MUTED, "line": 1.25}], label="footnote")
+    text(s, MX, 6.52, CW, 0.30,
+         [{"runs": [("WHAT'S INSIDE   ", {"weight": 700, "color": NAVY, "size": 7.8, "spc": 1.2}),
+                    ("1 Title  ·  2 Market structure  ·  3 Demand & elasticity  ·  "
+                     "4 Pricing strategy  ·  5 Rival response  ·  6 Capital budgeting  ·  "
+                     "7 Conclusion  ·  Appendix A–B", {"size": 8.4, "color": MUTED})],
+           "line": 1.3}], label="contents")
     footer(s, 1, TOTAL)
     return s
 
 # ══════════════════════════════════════════════════════ 2 · MARKET STRUCTURE
 def s2(prs):
     s = new_slide(prs)
-    top = header(s, "1 · Market & demand analysis", "Why this market is an oligopoly",
+    top = header(s, "Slide 2 · Market structure analysis", "Why this market is an oligopoly",
                  "Four firms sell 86% of India's electric scooters, each sets price by watching "
                  "the others, and entry costs ₹200 crore.",
                  session="Lecture link · Session 7: Game theory",
@@ -166,7 +169,8 @@ def s2(prs):
     cw = 5.05
     chh = cw / dims(f"{A}/chart_market_share.png")
     cx = PAGE_W - MX - cw
-    picture(s, f"{A}/chart_market_share.png", cx, top + 0.10, w=cw, h=chh)
+    picture(s, f"{A}/chart_market_share.png", cx, top + 0.10, w=cw, h=chh,
+            alt="Bar chart: FY25 electric two-wheeler market share — Ola 30.0%, TVS 21.4%, Bajaj 20.0%, Ather 11.6%, Hero 5.0%, others 8.0%")
     ny = note(s, cx, top + chh + 0.18, cw,
               "Concentration is the first test of an oligopoly: four firms, not the market, decide "
               "the price. Rivals track each other's prices and volumes week by week.")
@@ -184,7 +188,7 @@ def s2(prs):
 # ══════════════════════════════════════════════════════ 3 · DEMAND & ELASTICITY
 def s3(prs):
     s = new_slide(prs)
-    top = header(s, "1 · Market & demand analysis", "How petrol prices move our demand",
+    top = header(s, "Slide 3 · Demand & elasticity analysis", "How petrol prices move our demand",
                  "Petrol is the complement that makes a scooter run. When petrol gets dearer, the "
                  "petrol option loses its cost advantage and demand for Zenith-V rises.",
                  session="Lecture link · Session 5: Pricing strategies",
@@ -192,7 +196,8 @@ def s3(prs):
 
     cw = 6.62
     chh = cw / dims(f"{A}/chart_demand_shift.png")
-    picture(s, f"{A}/chart_demand_shift.png", MX, top - 0.10, w=cw, h=chh)
+    picture(s, f"{A}/chart_demand_shift.png", MX, top - 0.10, w=cw, h=chh,
+            alt="Demand diagram: when petrol rises from 95 to 115 rupees a litre the demand curve for the Zenith-V shifts right, from D0 to D1")
 
     # elasticity strip spans the full width beneath the chart and the cards
     ey = 5.66
@@ -216,7 +221,8 @@ def s3(prs):
         ("Petrol is a complement", BLUE, BLUE_L,
          [("A petrol scooter cannot run without petrol, so Zenith-V substitutes for the whole "
            "petrol bundle. The link is a cross-price elasticity, ", {}),
-          ("Exy > 0", {"weight": 700, "color": NAVY}),
+          ("E", {"weight": 700, "color": NAVY}), ("xy", {"weight": 700, "color": NAVY, "script": "sub"}),
+          (" > 0", {"weight": 700, "color": NAVY}),
           (": a dearer litre of petrol raises the quantity of EVs demanded.", {})]),
         ("The monthly arithmetic", TEAL, TEAL_L,
          [("60 km a day at 45 km/l = 40 litres a month, about ", {}),
@@ -248,7 +254,7 @@ def s3(prs):
 # ══════════════════════════════════════════════════════ 4 · PRICING
 def s4(prs):
     s = new_slide(prs)
-    top = header(s, "2 · Pricing & game theory", "Recommendation: penetration at ₹74,999",
+    top = header(s, "Slide 4 · Pricing strategy & justification", "Recommendation: penetration at ₹74,999",
                  "The choice is not margin versus growth. At ₹74,999 we still earn ₹14,999 on "
                  "every scooter, so penetration is a decision for scale — not a loss leader.",
                  session="Lecture link · Session 5: Pricing strategies",
@@ -270,7 +276,7 @@ def s4(prs):
     head_h, row_h = 0.36, 0.47
     rect(s, MX, ty, tw, head_h, fill=NAVY, radius=0.0)
     text(s, MX + col0, ty, colw, head_h,
-         [{"text": "PENETRATION   ←  RECOMMENDED", "size": 7.8, "color": WHITE, "weight": 700,
+         [{"text": "PENETRATION   ·   RECOMMENDED", "size": 7.8, "color": WHITE, "weight": 700,
            "spc": 0.8, "align": "c", "line": 1.0}], align="c", anchor="m", label="h1")
     text(s, MX + col0 + colw, ty, colw, head_h,
          [{"text": "SKIMMING", "size": 7.8, "color": BLUE_M, "weight": 700, "spc": 0.8,
@@ -309,7 +315,8 @@ def s4(prs):
     cw = 4.90
     chh = cw / dims(f"{A}/chart_price_tradeoff.png")
     cx = PAGE_W - MX - cw
-    picture(s, f"{A}/chart_price_tradeoff.png", cx, ty - 0.06, w=cw, h=chh)
+    picture(s, f"{A}/chart_price_tradeoff.png", cx, ty - 0.06, w=cw, h=chh,
+            alt="Line chart: units needed to recover the 200 crore plant against launch price — 1.33 lakh units at 74,999 versus 0.40 lakh at 1,10,000")
     note(s, cx, ty + chh + 0.02, cw,
          "Skimming recovers the plant in 0.40 lakh units; penetration needs 1.33 lakh. The real "
          "question is which volume the market will let us sell.", size=8.4)
@@ -335,7 +342,7 @@ def s4(prs):
 # ══════════════════════════════════════════════════════ 5 · RIVALS
 def s5(prs):
     s = new_slide(prs)
-    top = header(s, "2 · Pricing & game theory", "How Ola and Ather are likely to react",
+    top = header(s, "Slide 5 · Competitor response & interdependence", "How Ola and Ather are likely to react",
                  "Strategic interdependence: a rival's best price depends on ours. Our launch "
                  "changes their payoffs, so their reaction is part of our decision.",
                  session="Lecture link · Session 7: Game theory",
@@ -425,7 +432,7 @@ def s5(prs):
         sy += 0.17 + bh_ + 0.22
 
     cy = max(sy + 0.04, 4.78)
-    ch = 6.30 - cy
+    ch = 6.10 - cy
     rect(s, x, cy, w, ch, fill=TEAL_L, line=RGBColor(0xBF, 0xDD, 0xD7), lw=0.6, radius=0.04)
     text(s, x + 0.20, cy + 0.11, w - 0.40, 0.2,
          [{"text": "OUR COUNTER-MOVES", "size": 7.6, "color": TEAL, "weight": 700, "spc": 1.1,
@@ -439,7 +446,7 @@ def s5(prs):
                        (c, {"size": 8.6, "color": BODY})], "line": 1.28}]
         h = measure(p, w - 0.42)
         text(s, x + 0.20, yy, w - 0.40, h, p, label="cm-i")
-        yy += h + 0.085
+        yy += h + 0.115
 
     bottom_line(s, [("expect a matching response within weeks — so plan for a lower industry "
                      "margin, and win on cost and service instead.", {"size": 9.0, "color": NAVY})])
@@ -449,7 +456,7 @@ def s5(prs):
 # ══════════════════════════════════════════════════════ 6 · CAPITAL BUDGETING
 def s6(prs):
     s = new_slide(prs)
-    top = header(s, "3 · Capital budgeting", "A ₹50 crore NPV means the IRR is above 15%",
+    top = header(s, "Slide 6 · Capital budgeting analysis", "A ₹50 crore NPV means the IRR is above 15%",
                  "If the project is worth ₹50 crore more than it costs at a 15% discount rate, "
                  "its own rate of return must be higher than 15%.",
                  session="Lecture link · Sessions 8 & 9: Risk · Capital budgeting",
@@ -503,7 +510,8 @@ def s6(prs):
     cw = 5.15
     chh = cw / dims(f"{A}/chart_npv_profile.png")
     cx = PAGE_W - MX - cw
-    picture(s, f"{A}/chart_npv_profile.png", cx, top - 0.06, w=cw, h=chh)
+    picture(s, f"{A}/chart_npv_profile.png", cx, top - 0.06, w=cw, h=chh,
+            alt="NPV profile: project NPV falls as the discount rate rises and crosses zero at an IRR of about 21.3 percent")
     note(s, cx, top + chh + 0.04, cw,
          "The curve crosses zero exactly at the IRR. Any discount rate below 21.3% — including "
          "our 15% hurdle — leaves a positive NPV.", size=8.5)
@@ -544,7 +552,7 @@ def s6(prs):
 # ══════════════════════════════════════════════════════ 7 · CONCLUSION
 def s7(prs):
     s = new_slide(prs)
-    top = header(s, "4 · Conclusion", "Proceed — with a staged commitment",
+    top = header(s, "Slide 7 · Final recommendation & conclusion", "Proceed — with a staged commitment",
                  "All three analyses point the same way. The one refinement is to release capital "
                  "in stages, because the plant is a bet under uncertainty.",
                  session="Sessions 5–9 · recap")
@@ -731,10 +739,7 @@ def s9(prs):
              [{"text": desc, "size": 8.2, "color": MUTED, "line": 1.2}], label="sdesc")
         hlink = text(s, x + 1.02, y + 0.38, w - 1.02, 0.18,
                      [{"text": link, "size": 7.8, "color": BLUE, "line": 1.0}], label="slink")
-        try:
-            hlink.text_frame.paragraphs[0].runs[0].hyperlink.address = link
-        except Exception:
-            pass
+        link_run(s, hlink, link, tip=f"Watch {tag} — {name}")
         y += 0.68
         hline(s, x, y - 0.14, w, LINE, 0.6)
 
@@ -856,6 +861,19 @@ NOTES = {
     "traced to specific slides."),
 }
 
+SESSION_NOTE = {
+    1: "\n\nSessions covered: 5 Pricing Strategies, 6 Profit, 7 Game Theory, 8 Risk, 9 Capital Budgeting.",
+    2: "\n\nSource: Session 7 – Game Theory — https://youtu.be/f91JEkm7XZg",
+    3: "\n\nSource: Session 5 – Pricing Strategies — https://youtu.be/T25QYasiVrM",
+    4: "\n\nSource: Sessions 5 & 6 – Pricing Strategies, Profit — https://youtu.be/T25QYasiVrM  ·  https://youtu.be/d7Qw3Bu-23E",
+    5: "\n\nSource: Session 7 – Game Theory — https://youtu.be/f91JEkm7XZg",
+    6: "\n\nSource: Sessions 8 & 9 – Risk, Capital Budgeting — https://youtu.be/LsGQdSKB80o  ·  https://youtu.be/Y_NwyfpzUIo",
+    7: "\n\nAll sessions: 5, 6, 7, 8 and 9 of Managerial Economics.",
+    8: "\n\nAppendix A — every assumption used in the deck, with its source.",
+    9: "\n\nAppendix B — recorded sessions with links, and the rubric map.",
+}
+
+
 def main():
     prs = Presentation()
     prs.slide_width = I(PAGE_W)
@@ -865,7 +883,7 @@ def main():
         fn(prs)
     for i, sl in enumerate(prs.slides, 1):
         if i in NOTES:
-            sl.notes_slide.notes_text_frame.text = NOTES[i]
+            sl.notes_slide.notes_text_frame.text = NOTES[i] + SESSION_NOTE.get(i, "")
     prs.core_properties.title = "The Zenith-V Launch Decision"
     prs.core_properties.author = "J Ganesh Kumar Reddy (23BDS024)"
     prs.core_properties.subject = "Managerial Economics case study — IIIT Dharwad"

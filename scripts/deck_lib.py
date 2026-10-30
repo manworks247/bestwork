@@ -108,7 +108,7 @@ def vline(slide, x, y, h, color=LINE, lw=0.75):
 ALIGN = {"l": PP_ALIGN.LEFT, "c": PP_ALIGN.CENTER, "r": PP_ALIGN.RIGHT}
 ANCHOR = {"t": MSO_ANCHOR.TOP, "m": MSO_ANCHOR.MIDDLE, "b": MSO_ANCHOR.BOTTOM}
 
-def _style(r, size, color, weight, italic, spc, font):
+def _style(r, size, color, weight, italic, spc, font, script=None):
     r.font.size = Pt(size)
     r.font.bold = weight >= 600
     r.font.italic = italic
@@ -118,6 +118,8 @@ def _style(r, size, color, weight, italic, spc, font):
     if spc: rPr.set("spc", str(int(spc * 100)))
     lat = rPr.find(qn("a:latin"))
     if lat is not None: lat.set("typeface", font)
+    if script == "sub": rPr.set("baseline", "-25000")
+    elif script == "sup": rPr.set("baseline", "30000")
 
 def text(slide, x, y, w, h, paras, *, align="l", anchor="t", margins=(0, 0, 0, 0),
          shape=None, check=True, label=""):
@@ -141,7 +143,8 @@ def text(slide, x, y, w, h, paras, *, align="l", anchor="t", margins=(0, 0, 0, 0
         for txt_, ro in _runs_of(p):
             r = para.add_run(); r.text = txt_
             _style(r, ro.get("size", size), ro.get("color", color), ro.get("weight", weight),
-                   ro.get("i", p.get("i", False)), ro.get("spc", p.get("spc", 0)), FONT)
+                   ro.get("i", p.get("i", False)), ro.get("spc", p.get("spc", 0)), FONT,
+                   ro.get("script"))
     if check:
         need = measure(paras, w - margins[0] - margins[1])
         avail = h - margins[2] - margins[3]
@@ -162,7 +165,8 @@ def pill(slide, x, y, label, fill, fg=WHITE, size=8.2, weight=700, spc=1.0, h=0.
          align="c", anchor="m", shape=s)
     return w
 
-def picture(slide, path, x, y, w=None, h=None, crop=None):
+def picture(slide, path, x, y, w=None, h=None, crop=None, alt=None):
+    """Adds an image; `alt` becomes the alt text read by screen readers."""
     from PIL import Image
     iw, ih = Image.open(path).size
     if w is None: w = h * iw / ih
@@ -170,6 +174,8 @@ def picture(slide, path, x, y, w=None, h=None, crop=None):
     p = slide.shapes.add_picture(path, I(x), I(y), I(w), I(h))
     if crop:
         p.crop_left, p.crop_top, p.crop_right, p.crop_bottom = crop
+    if alt:
+        p._element.nvPicPr.cNvPr.set("descr", alt)
     return p
 
 # ─────────────────────────────────────────── page frame
@@ -195,7 +201,7 @@ def header(slide, section, title, sub=None, session=None, tag_color=BLUE,
                     "weight": 600, "spc": 1.1, "line": 1.0, "align": "r"}],
                   align="r", label="session")
         if session_link:
-            link_run(slide, st, session_link)
+            link_run(slide, st, session_link, tip="Open the recorded lecture session")
     th = measure([{"text": title, "size": 23, "weight": 700, "line": 1.12}], CW - 0.6)
     text(slide, MX, 0.58, CW, max(th, 0.42),
          [{"text": title, "size": 23, "color": NAVY, "weight": 700, "line": 1.12}], label="title")
@@ -225,12 +231,17 @@ def footer(slide, page, total=9):
            "line": 1.0, "align": "r"}], align="r", label="foot-page")
 
 
-def link_run(slide, shape, url):
+def link_run(slide, shape, url, tip=None):
     """Attach a hyperlink to every run of a text box (keeps the visible styling)."""
     for para in shape.text_frame.paragraphs:
         for run in para.runs:
             try:
                 run.hyperlink.address = url
+                if tip:
+                    h = run._r.find(qn("a:rPr"))
+                    for hc in (h if h is not None else []):
+                        if hc.tag == qn("a:hlinkClick"):
+                            hc.set("tooltip", tip)
             except Exception as exc:      # pragma: no cover
                 print("  ! link failed:", exc)
 
