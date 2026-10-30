@@ -1,0 +1,15 @@
+Point-cloud / 3D representation lab — runtime check
+Python: 3.11.2 (/tmp/gane-venv/bin/python)
+torch: 2.2.2
+numpy: 1.26.4
+scipy: 1.11.4
+trimesh: 4.5.3
+matplotlib: 3.8.4
+reportlab: 4.2.5
+Pillow: 10.4.0
+tqdm: 4.67.1
+PyTorch CUDA build: 12.1
+CUDA available: False
+CPU cores visible: 2
+Host memory reported: 3.85 GiB
+Device selected for executed smoke tests: CPU

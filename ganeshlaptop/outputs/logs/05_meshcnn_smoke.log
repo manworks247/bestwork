@@ -1,0 +1,14 @@
+Deterministic smoke-test fixtures prepared (not ModelNet/SHREC data).
+  Synthetic ModelNet40 layout: /home/user/bestwork/ganeshlaptop/data/synthetic_modelnet40_normal_resampled
+  Train examples: 2 across 2 classes; test examples: 40 across 40 classes
+  ModelNet10-style OFF mesh: /home/user/bestwork/ganeshlaptop/data/ModelNet10/chair/train/chair_0001.off
+  MeshCNN triangular OBJ: /home/user/bestwork/ganeshlaptop/data/meshcnn_fixture/icosphere.obj
+Section 7.4 | upstream MeshCNN CPU smoke test
+MeshCNN source: /tmp/meshcnn-upstream
+Fixture: data/meshcnn_fixture/icosphere.obj (generated trimesh icosphere; not SHREC)
+Topology: vertices=42, triangles=80, edges=120
+Edge feature tensor: (5, 120) (dihedral angle, opposite angles, ratios)
+Input tensor: (1, 5, 120, 1); logits: (1, 30) (30-way SHREC-like head only)
+Single synthetic-label cross-entropy: 3.177232; backward/Adam step: PASS
+STATUS: PASS — upstream MeshConv/connectivity path exercised; no SHREC training or accuracy claimed.
+EXIT_CODE=0

@@ -1,0 +1,14 @@
+PARAMETER ...
+Namespace(use_cpu=True, gpu='0', batch_size=2, model='pointnet2_cls_ssg', num_category=40, epoch=1, learning_rate=0.001, num_point=512, optimizer='Adam', log_dir='pointnet2_synthetic_smoke', decay_rate=0.0001, use_normals=False, process_data=False, use_uniform_sample=False)
+Load dataset ...
+The size of train data is 2
+The size of test data is 40
+No existing model, starting training from scratch...
+Epoch 1 (1/1):
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  2.12it/s]100%|██████████| 1/1 [00:00<00:00,  2.01it/s]
+Train Instance Accuracy: 0.000000
+  0%|          | 0/20 [00:00<?, ?it/s]  5%|▌         | 1/20 [00:00<00:03,  4.94it/s] 10%|█         | 2/20 [00:00<00:03,  5.90it/s] 15%|█▌        | 3/20 [00:00<00:02,  6.08it/s] 20%|██        | 4/20 [00:00<00:02,  6.31it/s] 25%|██▌       | 5/20 [00:00<00:02,  6.37it/s] 30%|███       | 6/20 [00:00<00:02,  6.37it/s] 35%|███▌      | 7/20 [00:01<00:02,  6.36it/s] 40%|████      | 8/20 [00:01<00:01,  6.39it/s] 45%|████▌     | 9/20 [00:01<00:01,  6.41it/s] 50%|█████     | 10/20 [00:01<00:01,  6.62it/s] 55%|█████▌    | 11/20 [00:01<00:01,  7.14it/s] 60%|██████    | 12/20 [00:01<00:01,  7.34it/s] 65%|██████▌   | 13/20 [00:01<00:00,  7.01it/s] 70%|███████   | 14/20 [00:02<00:00,  6.78it/s] 75%|███████▌  | 15/20 [00:02<00:00,  6.75it/s] 80%|████████  | 16/20 [00:02<00:00,  6.99it/s] 85%|████████▌ | 17/20 [00:02<00:00,  7.42it/s] 90%|█████████ | 18/20 [00:02<00:00,  7.33it/s] 95%|█████████▌| 19/20 [00:02<00:00,  7.72it/s]100%|██████████| 20/20 [00:02<00:00,  8.10it/s]100%|██████████| 20/20 [00:02<00:00,  6.85it/s]
+Test Instance Accuracy: 0.025000, Class Accuracy: 0.025000
+Best Instance Accuracy: 0.025000, Class Accuracy: 0.025000
+Saving at log/classification/pointnet2_synthetic_smoke/checkpoints/best_model.pth
+EXIT_CODE=0

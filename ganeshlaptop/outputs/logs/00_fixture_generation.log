@@ -1,0 +1,5 @@
+Deterministic smoke-test fixtures prepared (not ModelNet/SHREC data).
+  Synthetic ModelNet40 layout: /home/user/bestwork/ganeshlaptop/data/synthetic_modelnet40_normal_resampled
+  Train examples: 2 across 2 classes; test examples: 40 across 40 classes
+  ModelNet10-style OFF mesh: /home/user/bestwork/ganeshlaptop/data/ModelNet10/chair/train/chair_0001.off
+  MeshCNN triangular OBJ: /home/user/bestwork/ganeshlaptop/data/meshcnn_fixture/icosphere.obj

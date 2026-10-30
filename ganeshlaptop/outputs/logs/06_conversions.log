@@ -1,0 +1,15 @@
+Deterministic smoke-test fixtures prepared (not ModelNet/SHREC data).
+  Synthetic ModelNet40 layout: /home/user/bestwork/ganeshlaptop/data/synthetic_modelnet40_normal_resampled
+  Train examples: 2 across 2 classes; test examples: 40 across 40 classes
+  ModelNet10-style OFF mesh: /home/user/bestwork/ganeshlaptop/data/ModelNet10/chair/train/chair_0001.off
+  MeshCNN triangular OBJ: /home/user/bestwork/ganeshlaptop/data/meshcnn_fixture/icosphere.obj
+Section 7.5 | representation conversions
+Mesh -> point cloud: data/ModelNet10/chair/train/chair_0001.off -> 4096 area-uniform surface points
+  Saved: outputs/sampled_cube_4096.xyz; array shape=(4096, 3)
+Point cloud -> mesh: SciPy ConvexHull -> 106 hull vertices, 208 triangular faces
+  Method note: convex hull is used for a convex toy shape; it is not Poisson or Ball Pivoting.
+Mesh -> voxel: occupancy shape=(32, 32, 32), active=24389 cells
+Voxel -> point cloud: 24389 occupied-cell centers; saved outputs/voxel_occupied_centers.xyz
+STATUS: PASS — all four conversions executed on a synthetic cube fixture.
+Figure saved: outputs/figures/representation_conversion.png
+EXIT_CODE=0

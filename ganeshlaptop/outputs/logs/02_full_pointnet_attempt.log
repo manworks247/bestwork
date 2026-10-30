@@ -1,0 +1,14 @@
+PARAMETER ...
+Namespace(use_cpu=True, gpu='0', batch_size=24, model='pointnet2_cls_ssg', num_category=40, epoch=200, learning_rate=0.001, num_point=1024, optimizer='Adam', log_dir='pointnet2_modelnet40', decay_rate=0.0001, use_normals=False, process_data=False, use_uniform_sample=False)
+Load dataset ...
+Traceback (most recent call last):
+  File "/tmp/pointnet-upstream/train_classification.py", line 232, in <module>
+    main(args)
+  File "/tmp/pointnet-upstream/train_classification.py", line 121, in main
+    train_dataset = ModelNetDataLoader(root=data_path, args=args, split='train', process_data=args.process_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/pointnet-upstream/data_utils/ModelNetDataLoader.py", line 63, in __init__
+    self.cat = [line.rstrip() for line in open(self.catfile)]
+                                          ^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'data/modelnet40_normal_resampled/modelnet40_shape_names.txt'
+EXIT_CODE=1
